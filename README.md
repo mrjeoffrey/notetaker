@@ -4,7 +4,7 @@
 	
 <br>
 
-Use the Note Taker application to write and save notes. This application uses Express.js back-end and will save and retrieve note data from a JSON file.
+Please use the Note Taker application to write and save notes. This application uses Express.js back-end and will save and retrieve note data from a JSON file.
 <br>
 
 ## Table of Contents
