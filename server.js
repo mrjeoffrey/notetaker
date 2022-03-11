@@ -1,3 +1,15 @@
+// When opening the Note Taker, the user is presented with a landing page with links to a note page.
+
+// When the user clicks the link to the notes page, they are presented with a page with existing notes listed in the left-hand column, plus empty fields to enter a new note title and the note's text in the right-hand column.
+
+// When the user enters a new note title and text, then a Save icon appears in the navigation bar at the top of the page.
+
+// When the user clicks on the Save icon, then the new note is saved and appears in the left-hand column with the other existing notes.
+
+// When an existing note in the list in the left-hand column is clicked, then that note appears in the right-hand column.
+
+// When the user clicks the Write icon in the navigation bar at the top of the page, then they are presented with empty field to enter a new note title and text in the right-hand column.
+
 // Express ABCs - install dependencies
 const express = require("express");
 
@@ -12,11 +24,11 @@ app.use(express.static("public"));
 
 const util = require("util");
 const fs = require("fs");
-const uuid = require("uuid").v1;
+const uuid = require("uuid");
 
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
-dd;
+
 class Store {
 	read() {
 		return readFileAsync("./db/db.json", "utf8");
@@ -53,7 +65,7 @@ class Store {
 }
 
 // request the existing notes
-router.get("./public/notes", (req, res) => {
+router.get("/public/notes.html", (req, res) => {
 	store
 		.getNotes()
 		.then((notes) => {
