@@ -1,56 +1,59 @@
 // Express ABCs - install dependencies
 const express = require("express");
-
-// Express ABCs - setup express app (default)
-const app = express();
-const PORT = process.env.PORT || 5000;
-
+const path = require("path");
 const util = require("util");
 const fs = require("fs");
-const uuid = require("uuid");
 
-// Express ABCs - set express app for data parsing
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static("./public"));
-
+// async process
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
-class Store {
-	read() {
-		return readFileAsync("./db/db.json", "utf8");
-	}
-	write(note) {
-		return writeFileAsync("./db/db.json", JSON.stringify(note));
-	}
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-	addNote(note) {
-		const { title, text } = note;
+// Express ABCs - Setup Server
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-		if (!title || !text) {
-			throw new Error("title and text cannot be blank");
-		}
+// Express ABCs - Static Middleware
+app.use(express.static("./public"));
 
-		const newNote = { title, text, id: uuid() };
+// Express ABCs - GET Request - API ROUTING
 
-		return this.getNotes()
-			.then((notes) => [...notes, newNote])
-			.then((updatedNotes) => this.write(updatedNotes))
-			.then(() => this.newNote);
-	}
+app.get("api/notes", function (req, res) {
+	const note = req.body;
+	readFileAsync("./db/db.json", "utf8").then(function (data) {
+		notes = [].concat(JSON.parse(data));
+		res.json(notes);
+	});
+});
 
-	getNotes() {
-		return this.read().then((notes) => {
-			return JSON.parse(notes) || [];
-		});
-	}
-	removeNote(id) {
-		return this.getNotes()
-			.then((notes) => notes.filter((note) => note.id !== id))
-			.then((savedNotes) => this.write(savedNotes));
-	}
-}
+// 	addNote(note) {
+// 		const { title, text } = note;
+
+// 		if (!title || !text) {
+// 			throw new Error("title and text cannot be blank");
+// 		}
+
+// 		const newNote = { title, text, id: uuid() };
+
+// 		return this.getNotes()
+// 			.then((notes) => [...notes, newNote])
+// 			.then((updatedNotes) => this.write(updatedNotes))
+// 			.then(() => this.newNote);
+// 	}
+
+// 	getNotes() {
+// 		return this.read().then((notes) => {
+// 			return JSON.parse(notes) || [];
+// 		});
+// 	}
+// 	removeNote(id) {
+// 		return this.getNotes()
+// 			.then((notes) => notes.filter((note) => note.id !== id))
+// 			.then((savedNotes) => this.write(savedNotes));
+// 	}
+// }
 
 // request the existing notes
 router.get("notes", (req, res) => {
@@ -66,30 +69,30 @@ router.get("notes", (req, res) => {
 
 // posting note function route
 
-router.post("./public/notes", (req, res) => {
-	console.log(req.body);
-	store
-		.addNote(req.body)
-		.then((note) => {
-			res.json(note);
-		})
-		.catch((err) => {
-			res.status(500).json(err);
-		});
-});
+// router.post("./public/notes", (req, res) => {
+// 	console.log(req.body);
+// 	store
+// 		.addNote(req.body)
+// 		.then((note) => {
+// 			res.json(note);
+// 		})
+// 		.catch((err) => {
+// 			res.status(500).json(err);
+// 		});
+// });
 
 // delete note function route
 
-router.delete("./public/notes/:id", (req, res) => {
-	store
-		.removeNote(req.params.id)
-		.then(() => res.json({ ok: true }))
-		.catch((err) => res.status(500).json(err));
-});
+// router.delete("./public/notes/:id", (req, res) => {
+// 	store
+// 		.removeNote(req.params.id)
+// 		.then(() => res.json({ ok: true }))
+// 		.catch((err) => res.status(500).json(err));
+// });
 
-const path = require("path");
+// const path = require("path");
 
-const router = require("express").Router();
+// const router = require("express").Router();
 
 //Sends notes to the notes.html file
 router.get("./public/notes", (req, res) => {
