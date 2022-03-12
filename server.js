@@ -28,83 +28,59 @@ app.get("api/notes", function (req, res) {
 	});
 });
 
-// 	addNote(note) {
-// 		const { title, text } = note;
+// Express ABCs - POST Request - API ROUTING
 
-// 		if (!title || !text) {
-// 			throw new Error("title and text cannot be blank");
-// 		}
-
-// 		const newNote = { title, text, id: uuid() };
-
-// 		return this.getNotes()
-// 			.then((notes) => [...notes, newNote])
-// 			.then((updatedNotes) => this.write(updatedNotes))
-// 			.then(() => this.newNote);
-// 	}
-
-// 	getNotes() {
-// 		return this.read().then((notes) => {
-// 			return JSON.parse(notes) || [];
-// 		});
-// 	}
-// 	removeNote(id) {
-// 		return this.getNotes()
-// 			.then((notes) => notes.filter((note) => note.id !== id))
-// 			.then((savedNotes) => this.write(savedNotes));
-// 	}
-// }
-
-// request the existing notes
-router.get("notes", (req, res) => {
-	store
-		.getNotes()
-		.then((notes) => {
-			res.json(notes);
+app.post("/api/notes", function (req, res) {
+	const note = req.body;
+	readFileAsync("./db/db.json", "utf8")
+		.then(function (data) {
+			const notes = [].concat(JSON.parse(data));
+			note.id = notes.length + 1;
+			notes.push(note);
+			return notes;
 		})
-		.catch((err) => {
-			res.status(500).json(err);
+		.then(function (notes) {
+			writeFileAsync("./db/db.json", JSON.stringify(notes));
+			res.json(note);
 		});
 });
 
-// posting note function route
+// Express ABCs - DELETE Request - API Routing
+app.delete("/api/notes/:id", function (req, res) {
+	const idToDelete = parseInt(req.params.id);
+	readFileAsync("./db/db.json", "utf8")
+		.then(function (data) {
+			const notes = [].concat(JSON.parse(data));
+			const newNotesData = [];
+			for (let i = 0; i < notes.length; i++) {
+				if (idToDelete !== notes[i].id) {
+					newNotesData.push(notes[i]);
+				}
+			}
+			return newNotesData;
+		})
+		.then(function (notes) {
+			writeFileAsync("./db/db.json", JSON.stringify(notes));
+			res.send("Note Saved");
+		});
+});
 
-// router.post("./public/notes", (req, res) => {
-// 	console.log(req.body);
-// 	store
-// 		.addNote(req.body)
-// 		.then((note) => {
-// 			res.json(note);
-// 		})
-// 		.catch((err) => {
-// 			res.status(500).json(err);
-// 		});
-// });
-
-// delete note function route
-
-// router.delete("./public/notes/:id", (req, res) => {
-// 	store
-// 		.removeNote(req.params.id)
-// 		.then(() => res.json({ ok: true }))
-// 		.catch((err) => res.status(500).json(err));
-// });
-
-// const path = require("path");
-
-// const router = require("express").Router();
-
+// Express ABCs - Routing to HTML
 //Sends notes to the notes.html file
-router.get("./public/notes", (req, res) => {
+app.get("/notes", function (req, res) {
 	res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
 
 //Sends to the homepage if a pathing issue exists
-router.get("*", (req, res) => {
+app.get("/", function (req, res) {
+	res.sendFile(path.join(__dirname, "./public/index.html"));
+});
+
+app.get("*", function (req, res) {
 	res.sendFile(path.join(__dirname, "./public/index.html"));
 });
 
 // Express ABCs - start server
-app.listen(PORT, () => {
-	console.log(`Now listening on PORT: ${PORT}`);
+app.listen(PORT, function () {
+	console.log("App listening on PORT " + PORT);
 });
