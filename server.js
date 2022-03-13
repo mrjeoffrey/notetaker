@@ -9,7 +9,7 @@ const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Express ABCs - Setup Server
 app.use(express.urlencoded({ extended: true }));
@@ -20,8 +20,7 @@ app.use(express.static("./public"));
 
 // Express ABCs - GET Request - API ROUTING
 
-app.get("api/notes", function (req, res) {
-	const note = req.body;
+app.get("/api/notes", function (req, res) {
 	readFileAsync("./db/db.json", "utf8").then(function (data) {
 		notes = [].concat(JSON.parse(data));
 		res.json(notes);
@@ -71,7 +70,6 @@ app.get("/notes", function (req, res) {
 	res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
 
-//Sends to the homepage if a pathing issue exists
 app.get("/", function (req, res) {
 	res.sendFile(path.join(__dirname, "./public/index.html"));
 });
